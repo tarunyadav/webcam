@@ -1,5 +1,8 @@
 #!/bin/bash
 # make a movie out of the pictures for the specified day
+# TODO: document command line to make link icons:
+# convert -background black -size 48x36 -gravity center -font "/usr/share/fonts/truetype/calibri.ttf" -pointsize 20  -fill white label:"pics" pics_36.png
+
 
 ######################################################################
 # Default values
@@ -322,7 +325,7 @@ then
 	    $THUMB_DATED_ABSOLUTE_PATH
 	
 	cat > ${MONTH_ABSOLUTE_DIR}/${TARGET_DATE}.html <<EOF
-<a href="${DAY_RELATIVE_DIR}">pics</a> | <a href="${MOVIE_RELATIVE_PATH}">HD</a> | <a href="${MOVIE_LOW_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}" onmouseover="this.src='${THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE} with date overlaid';" onmouseout="this.src='${THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';"/></a><img class="preload" src="${THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE} with date overlaid"/><br/>
+<a href="${DAY_RELATIVE_DIR}"><img src="/pics_${MONTAGE_HEIGHT}.png" alt="pictures"/></a><a href="${MOVIE_RELATIVE_PATH}"><img src="/hd_${MONTAGE_HEIGHT}.png" alt="HD"/></a><a href="${MOVIE_LOW_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}" onmouseover="this.src='${THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE} with date overlaid';" onmouseout="this.src='${THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';"/></a><img class="preload" src="${THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE} with date overlaid"/><br/>
 EOF
 
         #####################################################################

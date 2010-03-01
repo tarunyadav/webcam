@@ -1,0 +1,48 @@
+body, html {
+    font-family: Calibri;
+    margin:0;
+    padding:0;
+    color:#000;
+}
+img {
+    border:none;
+}
+#wrap {
+    width:900px;
+    margin:0 auto;
+    }
+#wide {
+    width: 100%;
+    text-align:left;
+    padding-left: 5em;
+    }
+#header {
+    width: 100%;
+    padding:5px 5px;
+    }
+#header img {
+    vertical-align:middle;
+}
+#onecolumn img {
+    vertical-align:middle;
+}
+h1 {
+    margin:0;
+    }
+#main {
+    float:left;
+    text-align: center;
+    width:640px;
+    }
+h2 {
+    margin:0 0 1em;
+    }
+#sidebar {
+    float:right;
+    width:258px;
+    padding-left: 2px;
+    }
+
+.preload {
+display:none;
+}
