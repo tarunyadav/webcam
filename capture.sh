@@ -1,6 +1,5 @@
 #!/bin/bash
 # capture a photo from the webcam
-
 WEB_ABSOLUTE_DIR=/var/www
 CAM_RELATIVE_DIR=webcam
 CURRENT_RELATIVE_PATH=/${CAM_RELATIVE_DIR}/current.jpg
@@ -124,8 +123,7 @@ if [ ! -e INDEX_ABSOLUTE_DIR ]
 then
     ln -s $INDEX_MASTER_ABSOLUTE_DIR $INDEX_ABSOLUTE_DIR
 fi
-TEMP_FILE_NAME=temp.jpg
-TEMP_FILE_PATH=${TEMP_DIR}/${TEMP_FILE_NAME}
+
 
 ######################################################################
 # stay in the loop for the current minute
@@ -134,6 +132,8 @@ while [ "`date +%H%M`" -le "${HOUR_STRING}${MINUTE_STRING}" ]
 do
     BASE=`date +%H:%M:%S`
     FILE_NAME=${BASE}.jpg
+    TEMP_FILE_NAME=${BASE}_raw.jpg
+    TEMP_FILE_PATH=${PIC_ABSOLUTE_DIR}/${TEMP_FILE_NAME}
     THUMB_NAME=${BASE}_thumb.jpg
     THUMB_HTML_NAME=${BASE}.html
     PIC_ABSOLUTE_PATH=${PIC_ABSOLUTE_DIR}/${FILE_NAME}
@@ -163,6 +163,7 @@ do
 
     if [ -e "${GPHOTO2_PATH}" ]
     then
+	# trying a special temp_dir because gphoto2 seems ultra-sensative to directory
         # gphoto2 does not seem to like it if the filename is pathed, so run it from the working directory
         pushd ${TEMP_DIR}
         capture_result=`gphoto2 --filename ${TEMP_FILE_NAME} --capture-image-and-download`
