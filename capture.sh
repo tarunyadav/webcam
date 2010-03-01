@@ -161,11 +161,12 @@ do
         popd
     fi
 
-    if [ -e "${GHOTO2_PATH}" ]
+    if [ -e "${GPHOTO2_PATH}" ]
     then
         # gphoto2 does not seem to like it if the filename is pathed, so run it from the working directory
         pushd ${TEMP_DIR}
         capture_result=`gphoto2 --filename ${TEMP_FILE_NAME} --capture-image-and-download`
+	chmod a+r ${TEMP_FILE_NAME}
         popd
     fi
 
@@ -212,7 +213,7 @@ EOF
 
     if [ -n "${FLIP}" ]
     then
-	mogrify -rotate 180 ${TEMP_FILE_PATH}
+	mogrify -rotate ${FLIP} ${TEMP_FILE_PATH}
     fi
 
     if [ -n "${JPEGPIXI_PATH}" ] && [ -n "${JPEGPIXI_ARGUMENT}" ]
