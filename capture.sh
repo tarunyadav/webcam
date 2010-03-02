@@ -261,11 +261,11 @@ EOF
 	then
             convert -geometry ${THUMB_DIMENSION} ${PIC_ABSOLUTE_PATH} ${THUMB_ABSOLUTE_PATH}
             cat > ${THUMB_HTML_PATH} <<EOF 
-    <a href="${PIC_ABSOLUTE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="Thumbnail for ${PRETTY_TIME}, ${PRETTY_DAY}"/></a><br/>
+    <a href="${PIC_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="Thumbnail for ${PRETTY_TIME}, ${PRETTY_DAY}"/></a><br/>
 EOF
 	else
             cat > ${THUMB_HTML_PATH} <<EOF 
-    <img src="${PIC_ABSOLUTE_PATH}" alt="Thumbnail for ${PRETTY_TIME}, ${PRETTY_DAY}"/><br/>
+    <img src="${PIC_RELATIVE_PATH}" alt="Thumbnail for ${PRETTY_TIME}, ${PRETTY_DAY}"/><br/>
 EOF
 	fi
     fi
