@@ -22,7 +22,6 @@ MONTAGE_MINIMUM=45
 FRAME_SIZE='1920x1080'
 OFFSET='+792+477'
 SECOND_PIC_DIR=
-PIP_OFFSET=
 MAKE_MOVIE=0
 MAKE_MONTAGE=0
 UPDATE_HOMEPAGE=0
@@ -63,8 +62,6 @@ OPTIONS:
    -n      Number of frames to use in montage.  Defaults to $MONTAGE_FRAME_COUNT
    -o      Offset for cropping.  Set to zero to scale instead of crop.  
            Defaults to $OFFSET
-   -p      Second picture offset.  Meaningless if second picture dir is blank.  
-           Defaults to $PIP_OFFSET
    -s      Second picture dir, for PIP.  Leave blank for none.  Defaults to blank.
    -t      Dimensions of each tapestry picture.  Defaults to $TAPESTRY_DIM
    -v      Verbose output and preserve the temp output
@@ -78,7 +75,7 @@ OPTIONS:
 EOF
 }
 
-while getopts a:b:d:e:f:hi:l:m:n:o:p:s:t:vw:z:01234 o
+while getopts a:b:d:e:f:hi:l:m:n:o:s:t:vw:z:01234 o
 do	
     case "$o" in
 	a)      MONTAGE_HEIGHT="$OPTARG";;
@@ -92,7 +89,6 @@ do
         i)      TITLE="$OPTARG";;
         m)      MUSIC_DIR="$OPTARG";;
 	n)      MONTAGE_FRAME_COUNT="$OPTARG";;
-	p)      PIP_OFFSET="$OPTARG";;
 	o)      OFFSET="$OPTARG";;
 	s)      SECOND_PIC_DIR="$OPTARG";;
 	t)      TAPESTRY_DIM="$OPTARG";;
@@ -197,7 +193,7 @@ then
             minute=${file:(-9):2}
             second=${file:(-6):2}
             #assume closest match for the minute (not second) is good enough
-            pip=`ls ${PIP_ABSOLUTE_DIR}/${hour}:${minute}*jpg | sort | tail -n 1`
+            pip=`ls ${PIP_ABSOLUTE_DIR}/${hour}:${minute}:??.*jpg | sort | tail -n 1`
             if [ -e "$pip" ]
             then
                 composite -gravity southeast $pip ${output_path} ${output_path}
