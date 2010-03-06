@@ -145,9 +145,9 @@ YEAR_ABSOLUTE_DIR=${BASE_ABSOLUTE_DIR}/${YEAR}
 YEAR_RELATIVE_DIR=/${BASE_RELATIVE_DIR}/${YEAR}
 MONTH_ABSOLUTE_DIR=${YEAR_ABSOLUTE_DIR}/${MONTH}
 MONTH_RELATIVE_DIR=${YEAR_RELATIVE_DIR}/${MONTH}
-INDEX_MASTER_ABSOLUTE_DIR=${WEB_ABSOLUTE_DIR}/index_month.php
-INDEX_ABSOLUTE_DIR=${MONTH_ABSOLUTE_DIR}/index.php
-if [ ! -e INDEX_ABSOLUTE_DIR ]
+INDEX_MASTER_ABSOLUTE_DIR=${WEB_ABSOLUTE_DIR}/index_year.php
+INDEX_ABSOLUTE_DIR=${YEAR_ABSOLUTE_DIR}/index.php
+if [ ! -e $INDEX_ABSOLUTE_DIR ]
 then
     ln -s $INDEX_MASTER_ABSOLUTE_DIR $INDEX_ABSOLUTE_DIR
 fi
@@ -320,15 +320,15 @@ then
 	    -fill white -annotate +0+0 "${PRETTY_DATE}" \
 	    $THUMB_DATED_ABSOLUTE_PATH
 	
-	cat > ${MONTH_ABSOLUTE_DIR}/${TARGET_DATE}.html <<EOF
-<a href="${DAY_RELATIVE_DIR}"><img src="/pics_${MONTAGE_HEIGHT}.png" alt="pictures"/></a><a href="${MOVIE_RELATIVE_PATH}"><img src="/hd_${MONTAGE_HEIGHT}.png" alt="HD"/></a><a href="${MOVIE_LOW_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}" onmouseover="this.src='${THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE} with date overlaid';" onmouseout="this.src='${THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';"/></a><img class="preload" src="${THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE} with date overlaid"/><br/>
+	cat > ${YEAR_ABSOLUTE_DIR}/${TARGET_DATE}.html <<EOF
+<a  name="${MONTH}" href="${DAY_RELATIVE_DIR}"><img src="/pics_${MONTAGE_HEIGHT}.png" alt="pictures"/></a><a href="${MOVIE_RELATIVE_PATH}"><img src="/hd_${MONTAGE_HEIGHT}.png" alt="HD"/></a><a href="${MOVIE_LOW_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}" onmouseover="this.src='${THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';" onmouseout="this.src='${THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';"/></a><img class="preload" src="${THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}"/><br/>
 EOF
 
         #####################################################################
 	# rebuild the movie thumbnail for the month
         #####################################################################
 
-	montage -geometry +0+0 -tile 1x`ls ${MONTH_ABSOLUTE_DIR}/*_strip.jpg | wc -l` ${MONTH_ABSOLUTE_DIR}/*strip.jpg $MONTH_THUMB_ABSOLUTE_PATH
+	montage -geometry +0+0 -tile 1x`ls ${MONTH_ABSOLUTE_DIR}/*_strip.jpg | wc -l` `ls -r ${MONTH_ABSOLUTE_DIR}/*strip.jpg` $MONTH_THUMB_ABSOLUTE_PATH
 
 	mogrify -resize ${MONTH_THUMB_WIDTH}x $MONTH_THUMB_ABSOLUTE_PATH
 
@@ -344,7 +344,7 @@ EOF
 	    $MONTH_THUMB_DATED_ABSOLUTE_PATH \
 
 	cat > ${BASE_ABSOLUTE_DIR}/${YEAR}-${MONTH}_index.html <<EOF
-<a href="${MONTH_RELATIVE_DIR}"><img src="${MONTH_THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}" onmouseover="this.src='${MONTH_THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH} with date overlaid';" onmouseout="this.src='${MONTH_THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';"/></a><img class="preload" src="${MONTH_THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH} with date overlaid"/><br/>
+<a href="${YEAR_RELATIVE_DIR}/#${MONTH}"><img src="${MONTH_THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}" onmouseover="this.src='${MONTH_THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';" onmouseout="this.src='${MONTH_THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';"/></a><img class="preload" src="${MONTH_THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}"/><br/>
 EOF
 
     fi
