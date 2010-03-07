@@ -1,19 +1,19 @@
 <html>
 <head>
-<title>BeachCam</title>
+<title><?php include=("title.txt") ?></title>
   <link rel="stylesheet" type="text/css" href="basic.css" media="all">
 </head>
 <body>
 <div id="wrap">
   <div id="header">
-    <?php include("beachcam/movie_thumb.html"); ?>
+    <?php include("webcam/movie_thumb.html"); ?>
   </div>
   <div id="main">
-  <?php include("beachcam/current.html"); ?>
+  <?php include("webcam/current.html"); ?>
   </div>
   <div id="sidebar">
     <?php
-    foreach(glob("beachcam/????-??_index.html") as $index_filename) {
+    foreach(glob("webcam/????-??_index.html") as $index_filename) {
         $files[] = $index_filename;
     } rsort($files);
 
