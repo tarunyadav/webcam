@@ -1,6 +1,6 @@
 <html>
 <head>
-<title><?php include=("title.txt") ?></title>
+<title><?php include("title.txt") ?></title>
   <link rel="stylesheet" type="text/css" href="basic.css" media="all">
 </head>
 <body>
