@@ -3,7 +3,6 @@
 # TODO: document command line to make link icons:
 # convert -background black -size 48x36 -gravity center -font "/usr/share/fonts/truetype/calibri.ttf" -pointsize 20  -fill white label:"pics" pics_36.png
 
-
 ######################################################################
 # Default values
 ######################################################################
@@ -158,6 +157,7 @@ MOVIE_NAME=${TARGET_DATE}.mp4
 MOVIE_LOW_NAME=${TARGET_DATE}_low.mp4
 MOVIE_ABSOLUTE_PATH=${MONTH_ABSOLUTE_DIR}/${MOVIE_NAME}
 MOVIE_RELATIVE_PATH=${MONTH_RELATIVE_DIR}/${MOVIE_NAME}
+MOVIE_INDEX_PATH=${BASE_ABSOLUTE_DIR}/movie_thumb.html 
 MOVIE_LOW_ABSOLUTE_PATH=${MONTH_ABSOLUTE_DIR}/${MOVIE_LOW_NAME}
 MOVIE_LOW_RELATIVE_PATH=${MONTH_RELATIVE_DIR}/${MOVIE_LOW_NAME}
 STRIP_ABSOLUTE_PATH=${MONTH_ABSOLUTE_DIR}/${TARGET_DATE}_strip.jpg
@@ -166,10 +166,12 @@ THUMB_ABSOLUTE_PATH=${MONTH_ABSOLUTE_DIR}/${TARGET_DATE}_thumb.jpg
 THUMB_RELATIVE_PATH=${MONTH_RELATIVE_DIR}/${TARGET_DATE}_thumb.jpg
 THUMB_DATED_ABSOLUTE_PATH=${MONTH_ABSOLUTE_DIR}/${TARGET_DATE}_thumb_dated.jpg
 THUMB_DATED_RELATIVE_PATH=${MONTH_RELATIVE_DIR}/${TARGET_DATE}_thumb_dated.jpg
-MONTH_THUMB_ABSOLUTE_PATH=${YEAR_ABSOLUTE_DIR}/${YEAR}-${MONTH}_thumb.jpg
-MONTH_THUMB_RELATIVE_PATH=${YEAR_RELATIVE_DIR}/${YEAR}-${MONTH}_thumb.jpg
-MONTH_THUMB_DATED_ABSOLUTE_PATH=${YEAR_ABSOLUTE_DIR}/${YEAR}-${MONTH}_thumb_dated.jpg
-MONTH_THUMB_DATED_RELATIVE_PATH=${YEAR_RELATIVE_DIR}/${YEAR}-${MONTH}_thumb_dated.jpg
+MONTH_THUMB_ABSOLUTE_PATH=${MONTH_ABSOLUTE_DIR}/${YEAR}-${MONTH}_thumb.jpg
+MONTH_THUMB_RELATIVE_PATH=${MONTH_RELATIVE_DIR}/${YEAR}-${MONTH}_thumb.jpg
+MONTH_THUMB_DATED_ABSOLUTE_PATH=${MONTH_ABSOLUTE_DIR}/${YEAR}-${MONTH}_thumb_dated.jpg
+MONTH_THUMB_DATED_RELATIVE_PATH=${MONTH_RELATIVE_DIR}/${YEAR}-${MONTH}_thumb_dated.jpg
+MONTH_INDEX_PATH=${MONTH_ABSOLUTE_DIR}/${TARGET_DATE}.html
+MONTH_TAPESTRY_PATH=${BASE_ABSOLUTE_DIR}/${YEAR}-${MONTH}_index.html
 
 if [ "$MAKE_MOVIE" -eq 1 ]
 then
@@ -260,6 +262,8 @@ then
 	then
 	    MONTAGE_NOT_ENOUGH=1
 	else
+
+	    # Duration = interval * frame count.  Calculate the missing one.
 	    if [ -z ${MONTAGE_FRAME_COUNT} ]
 	    then
 		MONTAGE_FRAME_COUNT=`expr $DURATION / $MONTAGE_INTERVAL`
@@ -279,8 +283,7 @@ then
 	fi
     fi
 
-    # test for error conditions
-
+    # test for error conditions that would make us skip the montage
     if [ "$MONTAGE_NOT_ENOUGH" -eq 0 ] && [ "$MONTAGE_NO_DATA" -eq 0 ]
     then
 	# no errors, so make the montage and update the index
@@ -320,7 +323,7 @@ then
 	    -fill white -annotate +0+0 "${PRETTY_DATE}" \
 	    $THUMB_DATED_ABSOLUTE_PATH
 	
-	cat > ${YEAR_ABSOLUTE_DIR}/${TARGET_DATE}.html <<EOF
+	cat > ${MONTH_INDEX_PATH} <<EOF
 <a  name="${MONTH}" href="${DAY_RELATIVE_DIR}"><img src="/pics_${MONTAGE_HEIGHT}.png" alt="pictures"/></a><a href="${MOVIE_RELATIVE_PATH}"><img src="/hd_${MONTAGE_HEIGHT}.png" alt="HD"/></a><a href="${MOVIE_LOW_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}" onmouseover="this.src='${THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';" onmouseout="this.src='${THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';"/></a><img class="preload" src="${THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}"/><br/>
 EOF
 
@@ -343,8 +346,8 @@ EOF
 	    -fill white -annotate +0+0 "${PRETTY_MONTH}" \
 	    $MONTH_THUMB_DATED_ABSOLUTE_PATH \
 
-	cat > ${BASE_ABSOLUTE_DIR}/${YEAR}-${MONTH}_index.html <<EOF
-<a href="${YEAR_RELATIVE_DIR}/#${MONTH}"><img src="${MONTH_THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}" onmouseover="this.src='${MONTH_THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';" onmouseout="this.src='${MONTH_THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';"/></a><img class="preload" src="${MONTH_THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}"/><br/>
+	cat > ${MONTH_TAPESTRY_PATH} <<EOF
+<a href="${MONTH_RELATIVE_DIR}"><img src="${MONTH_THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}" onmouseover="this.src='${MONTH_THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';" onmouseout="this.src='${MONTH_THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';"/></a><img class="preload" src="${MONTH_THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}"/><br/>
 EOF
 
     fi
@@ -352,9 +355,9 @@ EOF
 fi
 
 # possibly rebuild the homepage
-if [ "$UPDATE_HOMEPAGE" -eq 1 ] && [ -e "${MONTH_ABSOLUTE_DIR}/${TARGET_DATE}.html" ]
+if [ "$UPDATE_HOMEPAGE" -eq 1 ] && [ -e "${MONTH_INDEX_PATH}" ]
 then
-    cp ${MONTH_ABSOLUTE_DIR}/${TARGET_DATE}.html ${BASE_ABSOLUTE_DIR}/movie_thumb.html 
+    cp ${MONTH_INDEX_PATH} ${MOVIE_INDEX_PATH}
 fi
 
 if [ "$REPLACE_SOUNDTRACK" -eq 1 ]
