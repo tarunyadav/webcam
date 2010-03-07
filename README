@@ -1,0 +1,71 @@
+This is a collection of scripts that create a web page to view pictures and movies collected by a camera.
+
+How to use the WebCam scripts:
+
+0) Download and save the scripts and other files to a local directory (http://github.com/jaufrec/webcam/tarball/master)
+
+1) Get a source of images, such as a camera.  WebCam can collect images in any of three ways:
+   a) The GPhoto2 program
+   b) The Capture program.  To install on ubuntu:
+      apt-get install libusb-dev pkg-config libgtk2.0-dev libreadline-dev
+      download, compile, and install libptp2 from http://libptp.sourceforge.net
+      download, compile, and install capture from http://capture.sourceforge.net
+   c) from any source that puts new pictures into a directory.  I use the http://www.airlink101.com/products/aic250.php
+
+2) Set up a webserver with PHP.  On Ubuntu:
+
+  apt-get install lighttpd php5-cgi
+  lighty-enable-mod fastcgi
+  /etc/init.d/lighttpd force-reload
+
+3) Copy the php, png, and txt files from the tarball to the webserver root directory.  The user that runs the scripts should have permission to write to a directory on the webserver.  The directory structure will be:
+
+/
+ index.php (provided with webcam)
+ index_month.php (provided with webcam)
+ index_day.php (provided with webcam)
+ pics_18.png (provided with webcam)
+ hd_18.png (provided with webcam)
+ pics_36.png (provided with webcam)
+ hd_36.png (provided with webcam)
+ title.txt (provided with webcam - replace this with your title)
+ basic.css (provided with webcam)
+ webcam/
+        current.jpg
+        current.html
+        movie_thumb.html
+        YYYY-MM_index.html
+        YYYY/
+             MM/
+                index.php
+                YYYY-MM_thumb.jpg
+                YYYY-MM_thumb_dated.jpg
+                YYYY-MM-DD.html
+                YYYY-MM-DD_strip.jpg
+                YYYY-MM-DD_thumb.jpg
+                YYYY-MM-DD_thumb_dated.jpg
+                YYYY-MM-DD.mp4
+                YYYY-MM-DD_low.mp4
+                DD/
+                   index.php
+                   HH:MM:SS.jpg
+                   HH:MM:SS_thumb.jpg
+                   HH:MM:SS.html
+
+All files and directories in this structure are automatically created by the scirpts unless otherwise noted.
+
+4) Install ffmpeg:
+On ubuntu, 
+
+  sudo apt-get install ffmpeg libavcodec-unstripped-52 libavutil-unstripped-49 normalize-audio libsox-fmt-mp3 
+
+5) install calibri.ttf at /usr/share/fonts/truetype
+
+6) Add the capture.sh script regularly, e.g., every minute.  Use the flags to customize For example, put this in your cron:
+
+* *  *   *   *     /usr/share/webcam/capture.sh -c /bin/capture -r konacam1 -t 256x192 -u 640x480 
+6a) To capture an image more frequently than once per minute in cron, which only runs one per minute, use the -w flag.  This will capture an image every W seconds throughout each minute.
+
+7) Add the daily_movie.sh script to run once per day, right after midnight.  for example:
+
+3 0  *   *   *     /usr/share/webcam/daily_movie.sh -b konacam1 -z 1440x1080 -o "" -w +1+0 -e 4 -a 36 -1 -2 -3 -4
