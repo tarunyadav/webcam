@@ -324,7 +324,7 @@ then
 	    $THUMB_DATED_ABSOLUTE_PATH
 	
 	cat > ${MONTH_INDEX_PATH} <<EOF
-<a  name="${MONTH}" href="${DAY_RELATIVE_DIR}"><img src="/pics_${MONTAGE_HEIGHT}.png" alt="pictures"/></a><a href="${MOVIE_RELATIVE_PATH}"><img src="/hd_${MONTAGE_HEIGHT}.png" alt="HD"/></a><a href="${MOVIE_LOW_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}" onmouseover="this.src='${THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';" onmouseout="this.src='${THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';"/></a><img class="preload" src="${THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}"/><br/>
+<a href="${DAY_RELATIVE_DIR}"><img src="/pics_${MONTAGE_HEIGHT}.png" alt="pics" title="Click for pictures"/></a><a href="${MOVIE_RELATIVE_PATH}"><img src="/hd_${MONTAGE_HEIGHT}.png" alt="HD" title="Click to download high-definition movie"/></a><a href="${MOVIE_LOW_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}" title="Click to download movie" onmouseover="this.src='${THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';" onmouseout="this.src='${THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';"/></a><img class="preload" src="${THUMB_DATED_RELATIVE_PATH}"/><br/>
 EOF
 
         #####################################################################
@@ -347,7 +347,7 @@ EOF
 	    $MONTH_THUMB_DATED_ABSOLUTE_PATH \
 
 	cat > ${MONTH_TAPESTRY_PATH} <<EOF
-<a href="${MONTH_RELATIVE_DIR}"><img src="${MONTH_THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}" onmouseover="this.src='${MONTH_THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';" onmouseout="this.src='${MONTH_THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';"/></a><img class="preload" src="${MONTH_THUMB_DATED_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}"/><br/>
+<a href="${MONTH_RELATIVE_DIR}"><img src="${MONTH_THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_MONTH}" title="Click to see ${PRETTY_MONTH}" onmouseover="this.src='${MONTH_THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';this.title='click to see ${PRETTY_MONTH}'" onmouseout="this.src='${MONTH_THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_MONTH}';this.title='click to see ${PRETTY_MONTH}';"/></a><img class="preload" src="${MONTH_THUMB_DATED_RELATIVE_PATH}"/><br/>
 EOF
 
     fi
