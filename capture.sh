@@ -133,7 +133,7 @@ do
     BASE=`date +%H:%M:%S`
     FILE_NAME=${BASE}.jpg
     TEMP_FILE_NAME=${BASE}_raw.jpg
-    TEMP_FILE_PATH=${TEMP_DIR}/${TEMP_FILE_NAME}
+    TEMP_FILE_PATH=${PIC_ABSOLUTE_DIR}/${TEMP_FILE_NAME}
     THUMB_NAME=${BASE}_thumb.jpg
     THUMB_HTML_NAME=${BASE}.html
     PIC_ABSOLUTE_PATH=${PIC_ABSOLUTE_DIR}/${FILE_NAME}
@@ -211,17 +211,17 @@ EOF
 	fi
         break
     fi
-    echo "foo"
+
     if [ -n "${FLIP}" ]
     then
 	mogrify -rotate ${FLIP} ${TEMP_FILE_PATH}
     fi
-    echo "bar"
+
     if [ -n "${JPEGPIXI_PATH}" ] && [ -n "${JPEGPIXI_ARGUMENT}" ]
     then
 	jpegpixi $TEMP_FILE_PATH $TEMP_FILE_PATH ${JPEGPIXI_ARGUMENT}
     fi
-    echo "baz"
+
     cp $TEMP_FILE_PATH $PIC_ABSOLUTE_PATH
 
     ######################################################################
@@ -243,11 +243,11 @@ EOF
 	then
             convert -geometry ${CURRENT_DIMENSION} ${PIC_ABSOLUTE_PATH} ${CURRENT_ABSOLUTE_PATH}
             cat > ${CURRENT_HTML_PATH} <<EOF 
-    <a href="${PIC_RELATIVE_PATH}"><img src="${CURRENT_RELATIVE_PATH}" alt="current picture." title="Click to zoom."/></a>
+    <a href="${PIC_RELATIVE_PATH}"><img src="${CURRENT_RELATIVE_PATH}" alt="${CAM_RELATIVE_DIR}"/></a>
 EOF
 	else
             cat > ${CURRENT_HTML_PATH} <<EOF 
-    <img src="${PIC_RELATIVE_PATH}" alt="current picture"/>
+    <img src="${PIC_RELATIVE_PATH}" alt="${CAM_RELATIVE_DIR}"/>
 EOF
 	fi
 	cat >> ${CURRENT_HTML_PATH} <<EOF
@@ -261,7 +261,7 @@ EOF
 	then
             convert -geometry ${THUMB_DIMENSION} ${PIC_ABSOLUTE_PATH} ${THUMB_ABSOLUTE_PATH}
             cat > ${THUMB_HTML_PATH} <<EOF 
-    <a href="${PIC_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="Thumbnail for ${PRETTY_TIME}, ${PRETTY_DAY}" title="Click to zoom"/></a><br/>
+    <a href="${PIC_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="Thumbnail for ${PRETTY_TIME}, ${PRETTY_DAY}"/></a><br/>
 EOF
 	else
             cat > ${THUMB_HTML_PATH} <<EOF 
