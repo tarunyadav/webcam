@@ -2,6 +2,7 @@
 # capture a photo from the webcam
 WEB_ABSOLUTE_DIR=/var/www
 CAM_RELATIVE_DIR=webcam
+CAM_NAME=Webcam
 CURRENT_RELATIVE_PATH=/${CAM_RELATIVE_DIR}/current.jpg
 CURRENT_ABSOLUTE_PATH=${WEB_ABSOLUTE_DIR}${CURRENT_RELATIVE_PATH}
 TEMP_DIR=`mktemp -d`
@@ -42,6 +43,7 @@ OPTIONS:
    -i      Path to directory of incoming photos of filename format YYYYMMDDHHMMSSxx.jpg. 
            Will erase contents of this directory.  Defaults to null.   
    -j      Path to jpegpixi image processer.  Defaults to null.   
+   -n      Camera name.  Defaults to ${CAM_NAME}
    -p      Argument for jpexpixi processor.  Defaults to null.   
    -r      Relative path for webcam directory.  Defaults to ${CAM_RELATIVE_DIR}
    -t      Thumbnail dimension.  Defaults to ${THUMB_DIMENSION}.  
@@ -56,7 +58,7 @@ OPTIONS:
 EOF
 }
 
-while getopts b:c:d:f:g:hi:j:p:r:t:u:vw: o
+while getopts b:c:d:f:g:hi:j:n:p:r:t:u:vw: o
 do	
     case "$o" in
 	b)      BACKUP_MESSAGE="$OPTARG";;
@@ -68,6 +70,7 @@ do
 		exit 1;;
 	i)      INCOMING_PATH="$OPTARG";;
 	j)      JPEGPIXI_PATH="$OPTARG";;
+	n)      CAM_NAME="$OPTARG";;
 	p)      JPEGPIXI_ARGUMENT="$OPTARG";;
 	r)      CAM_RELATIVE_DIR="$OPTARG";;
 	t)      THUMB_DIMENSION="$OPTARG";;
@@ -211,17 +214,17 @@ EOF
 	fi
         break
     fi
-    echo "foo"
+
     if [ -n "${FLIP}" ]
     then
 	mogrify -rotate ${FLIP} ${TEMP_FILE_PATH}
     fi
-    echo "bar"
+
     if [ -n "${JPEGPIXI_PATH}" ] && [ -n "${JPEGPIXI_ARGUMENT}" ]
     then
 	jpegpixi $TEMP_FILE_PATH $TEMP_FILE_PATH ${JPEGPIXI_ARGUMENT}
     fi
-    echo "baz"
+
     cp $TEMP_FILE_PATH $PIC_ABSOLUTE_PATH
 
     ######################################################################
@@ -279,11 +282,14 @@ EOF
 
 done
 
+echo "foo"
+
 ######################################################################
 # clean up
 ######################################################################
 
 if [ "$VERBOSE" == "0" ] 
     then
+    echo "bar"
     rm -rf $TEMP_DIR
 fi
