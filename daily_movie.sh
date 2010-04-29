@@ -1,7 +1,5 @@
 #!/bin/bash
 # make a movie out of the pictures for the specified day
-# TODO: document command line to make link icons:
-# convert -background black -size 48x36 -gravity center -font "/usr/share/fonts/truetype/calibri.ttf" -pointsize 20  -fill white label:"pics" pics_36.png
 
 ######################################################################
 # Default values
@@ -144,12 +142,21 @@ YEAR_ABSOLUTE_DIR=${BASE_ABSOLUTE_DIR}/${YEAR}
 YEAR_RELATIVE_DIR=/${BASE_RELATIVE_DIR}/${YEAR}
 MONTH_ABSOLUTE_DIR=${YEAR_ABSOLUTE_DIR}/${MONTH}
 MONTH_RELATIVE_DIR=${YEAR_RELATIVE_DIR}/${MONTH}
-INDEX_MASTER_ABSOLUTE_DIR=${WEB_ABSOLUTE_DIR}/index_year.php
+INDEX_MASTER_ABSOLUTE_DIR=${WEB_ABSOLUTE_DIR}/index.php
 INDEX_ABSOLUTE_DIR=${YEAR_ABSOLUTE_DIR}/index.php
+INDEX_MASTER_MONTH_ABSOLUTE_DIR=${WEB_ABSOLUTE_DIR}/index_month.php
+INDEX_MONTH_ABSOLUTE_DIR=${MONTH_ABSOLUTE_DIR}/index.php
+
 if [ ! -e $INDEX_ABSOLUTE_DIR ]
 then
     ln -s $INDEX_MASTER_ABSOLUTE_DIR $INDEX_ABSOLUTE_DIR
 fi
+
+if [ ! -e $INDEX_MONTH_ABSOLUTE_DIR ]
+then
+    ln -s $INDEX_MASTER_MONTH_ABSOLUTE_DIR $INDEX_MONTH_ABSOLUTE_DIR
+fi
+
 DAY_ABSOLUTE_DIR=${MONTH_ABSOLUTE_DIR}/${DAY}
 PIP_ABSOLUTE_DIR=${WEB_ABSOLUTE_DIR}/${SECOND_PIC_DIR}/${YEAR}/${MONTH}/${DAY}
 DAY_RELATIVE_DIR=${MONTH_RELATIVE_DIR}/${DAY}
@@ -324,7 +331,12 @@ then
 	    $THUMB_DATED_ABSOLUTE_PATH
 	
 	cat > ${MONTH_INDEX_PATH} <<EOF
-<a href="${DAY_RELATIVE_DIR}"><img src="/pics_${MONTAGE_HEIGHT}.png" alt="pics" title="Click for pictures"/></a><a href="${MOVIE_RELATIVE_PATH}"><img src="/hd_${MONTAGE_HEIGHT}.png" alt="HD" title="Click to download high-definition movie"/></a><a href="${MOVIE_LOW_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}" title="Click to download movie" onmouseover="this.src='${THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';" onmouseout="this.src='${THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';"/></a><img class="preload" src="${THUMB_DATED_RELATIVE_PATH}"/><br/>
+<a class="buttonright" href="${DAY_RELATIVE_DIR}" title="Click for pictures">pics</a>
+<a class="buttonright" href="${MOVIE_RELATIVE_PATH}" title="Click to download high-definition movie"/>HD</a>
+<a href="${MOVIE_LOW_RELATIVE_PATH}">
+  <img src="${THUMB_RELATIVE_PATH}" alt="montage for ${PRETTY_DATE}" title="Click to download movie" onmouseover="this.src='${THUMB_DATED_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';" onmouseout="this.src='${THUMB_RELATIVE_PATH}';this.alt='montage for ${PRETTY_DATE}';"/>
+</a>
+<img class="preload" src="${THUMB_DATED_RELATIVE_PATH}"/><br/>
 EOF
 
         #####################################################################
@@ -357,7 +369,16 @@ fi
 # possibly rebuild the homepage
 if [ "$UPDATE_HOMEPAGE" -eq 1 ] && [ -e "${MONTH_INDEX_PATH}" ]
 then
-    cp ${MONTH_INDEX_PATH} ${MOVIE_INDEX_PATH}
+    cat > ${MOVIE_INDEX_PATH} <<EOF
+<div class="titlebar">
+EOF
+
+    cat >> ${MOVIE_INDEX_PATH} < ${MONTH_INDEX_PATH}
+
+    cat >> ${MOVIE_INDEX_PATH} <<EOF
+</div>
+EOF
+
 fi
 
 if [ "$REPLACE_SOUNDTRACK" -eq 1 ]

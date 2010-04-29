@@ -3,18 +3,19 @@
 WEB_ABSOLUTE_DIR=/var/www
 CAM_RELATIVE_DIR=webcam
 CAM_NAME=Webcam
-CURRENT_RELATIVE_PATH=/${CAM_RELATIVE_DIR}/current.jpg
-CURRENT_ABSOLUTE_PATH=${WEB_ABSOLUTE_DIR}${CURRENT_RELATIVE_PATH}
+HOMEPAGE_RELATIVE_PATH=/${CAM_RELATIVE_DIR}/current.jpg
+HOMEPAGE_ABSOLUTE_PATH=${WEB_ABSOLUTE_DIR}${HOMEPAGE_RELATIVE_PATH}
 TEMP_DIR=`mktemp -d`
 CAPTURE_PATH=
 GPHOTO2_PATH=
 INCOMING_PATH=
-CURRENT_DIMENSION=
+HOMEPAGE_DIMENSION=
 THUMB_DIMENSION=
 JPEGPIXI_PATH=
 JPEGPIXI_ARGUMENT=
 FLIP=
 BACKUP_MESSAGE=
+VERBOSE=0
 
 ######################################################################
 # command line inputs
@@ -48,8 +49,8 @@ OPTIONS:
    -r      Relative path for webcam directory.  Defaults to ${CAM_RELATIVE_DIR}
    -t      Thumbnail dimension.  Defaults to ${THUMB_DIMENSION}.  
            If not null, creates thumbnail and index within daily directory
-   -u      Current thumbnail dimension.  Defaults to ${CURRENT_DIMENSION}.  
-           If not null, creates a thumbnail at ${CURRENT_ABSOLUTE_PATH},
+   -u      Current thumbnail dimension.  Defaults to ${HOMEPAGE_DIMENSION}.  
+           If not null, creates a thumbnail at ${HOMEPAGE_ABSOLUTE_PATH},
            which should appear on the home page.
    -v      Debug mode
    -w      Number of seconds to wait after taking a picture.  Defaults to null.  
@@ -74,7 +75,7 @@ do
 	p)      JPEGPIXI_ARGUMENT="$OPTARG";;
 	r)      CAM_RELATIVE_DIR="$OPTARG";;
 	t)      THUMB_DIMENSION="$OPTARG";;
-        u)      CURRENT_DIMENSION="$OPTARG";;
+        u)      HOMEPAGE_DIMENSION="$OPTARG";;
         v)      VERBOSE=1;;
 	w)      WAIT="$OPTARG";;
     esac
@@ -118,15 +119,16 @@ PIC_RELATIVE_DIR=/${CAM_RELATIVE_DIR}/${YEAR_STRING}/${MONTH_STRING}/${DAY_STRIN
 PIC_ABSOLUTE_DIR=${WEB_ABSOLUTE_DIR}${PIC_RELATIVE_DIR}
 INDEX_MASTER_ABSOLUTE_DIR=${WEB_ABSOLUTE_DIR}/index_day.php
 INDEX_ABSOLUTE_DIR=${PIC_ABSOLUTE_DIR}/index.php
-CURRENT_RELATIVE_PATH=/${CAM_RELATIVE_DIR}/current.jpg
-CURRENT_ABSOLUTE_PATH=${WEB_ABSOLUTE_DIR}${CURRENT_RELATIVE_PATH}
-CURRENT_HTML_PATH=${WEB_ABSOLUTE_DIR}/${CAM_RELATIVE_DIR}/current.html
+HOMEPAGE_RELATIVE_PATH=/${CAM_RELATIVE_DIR}/current.jpg
+HOMEPAGE_ABSOLUTE_PATH=${WEB_ABSOLUTE_DIR}${HOMEPAGE_RELATIVE_PATH}
+HOMEPAGE_HTML_PATH=${WEB_ABSOLUTE_DIR}/${CAM_RELATIVE_DIR}/current.html
 mkdir -p ${PIC_ABSOLUTE_DIR}
-if [ ! -e INDEX_ABSOLUTE_DIR ]
+if [ ! -e ${INDEX_ABSOLUTE_DIR} ]
 then
     ln -s $INDEX_MASTER_ABSOLUTE_DIR $INDEX_ABSOLUTE_DIR
 fi
 
+if [ ! -e $
 
 ######################################################################
 # stay in the loop for the current minute
@@ -158,9 +160,9 @@ do
         # The premise of capture is that you can start once, then capture many times 
         # without closing and re-opening the lens, but that didn't seem to work, so
         # we go through the full cycle each time
-        ${CAPTURE_PATH} 'start'
-        ${CAPTURE_PATH} "capture ${TEMP_FILE_NAME}"
-        ${CAPTURE_PATH} 'quit'
+        capture_result_1=`${CAPTURE_PATH} 'start'`
+        capture_result_2=`${CAPTURE_PATH} "capture ${TEMP_FILE_NAME}"`
+        capture_result_3=`${CAPTURE_PATH} 'quit'`
         popd
     fi
 
@@ -207,7 +209,7 @@ do
     then
 	if [ -n "${BACKUP_MESSAGE}" ]
 	then
-            cat > $CURRENT_HTML_PATH <<EOF 
+            cat > $HOMEPAGE_HTML_PATH <<EOF 
 ${BACKUP_MESSAGE}
 <p>${PRETTY_TIME}, ${PRETTY_DAY}</p>
 EOF
@@ -240,35 +242,49 @@ EOF
     dimension=${dimension#  Geometry: }
     dimension=${dimension%+0+0}
 
-    if [ -n "${CURRENT_DIMENSION}" ]
+    if [ -n "${HOMEPAGE_DIMENSION}" ]
     then
-	if [ "${dimension}" != "${CURRENT_DIMENSION}" ]
+	# Prepare a picture for the homepage.  Scale it if necessary.
+        cat > ${HOMEPAGE_HTML_PATH} <<EOF 
+<div class="candybox">
+  <div class="titlebar">
+    <span class="name">${CAM_NAME}</span>
+    <span>${PRETTY_TIME}, ${PRETTY_DAY}</span>
+    <a class="buttonright" href="${PIC_RELATIVE_DIR}">pics</a>
+  </div>
+  <div>
+EOF
+
+	if [ "${dimension}" != "${HOMEPAGE_DIMENSION}" ]
 	then
-            convert -geometry ${CURRENT_DIMENSION} ${PIC_ABSOLUTE_PATH} ${CURRENT_ABSOLUTE_PATH}
-            cat > ${CURRENT_HTML_PATH} <<EOF 
-    <a href="${PIC_RELATIVE_PATH}"><img src="${CURRENT_RELATIVE_PATH}" alt="current picture." title="Click to zoom."/></a>
+            convert -geometry ${HOMEPAGE_DIMENSION} ${PIC_ABSOLUTE_PATH} ${HOMEPAGE_ABSOLUTE_PATH}
+            cat >> ${HOMEPAGE_HTML_PATH} <<EOF 
+    <a href="${PIC_RELATIVE_PATH}"><img src="${HOMEPAGE_RELATIVE_PATH}" alt="current picture." title="Click to zoom."/></a>
 EOF
 	else
-            cat > ${CURRENT_HTML_PATH} <<EOF 
+            cat >> ${HOMEPAGE_HTML_PATH} <<EOF 
     <img src="${PIC_RELATIVE_PATH}" alt="current picture"/>
 EOF
 	fi
-	cat >> ${CURRENT_HTML_PATH} <<EOF
-<p>${PRETTY_TIME}, <a href="${PIC_RELATIVE_DIR}">${PRETTY_DAY}</a></p>
+
+	cat >> ${HOMEPAGE_HTML_PATH} <<EOF
+  </div>
+</div>
 EOF
     fi
 
     if [ -n "${THUMB_DIMENSION}" ] 
     then
+	# Make a thumbnail for the daily page
 	if [ "${dimension}" != "${THUMB_DIMENSION}" ]
 	then
             convert -geometry ${THUMB_DIMENSION} ${PIC_ABSOLUTE_PATH} ${THUMB_ABSOLUTE_PATH}
             cat > ${THUMB_HTML_PATH} <<EOF 
-    <a href="${PIC_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="Thumbnail for ${PRETTY_TIME}, ${PRETTY_DAY}" title="Click to zoom"/></a><br/>
+    <a href="${PIC_RELATIVE_PATH}"><img src="${THUMB_RELATIVE_PATH}" alt="Thumbnail" title="${PRETTY_TIME}"/></a><br/>
 EOF
 	else
             cat > ${THUMB_HTML_PATH} <<EOF 
-    <img src="${PIC_RELATIVE_PATH}" alt="Thumbnail for ${PRETTY_TIME}, ${PRETTY_DAY}"/><br/>
+    <img src="${PIC_RELATIVE_PATH}" title="${PRETTY_TIME}"/><br/>
 EOF
 	fi
     fi
@@ -282,14 +298,11 @@ EOF
 
 done
 
-echo "foo"
-
 ######################################################################
 # clean up
 ######################################################################
 
 if [ "$VERBOSE" == "0" ] 
     then
-    echo "bar"
     rm -rf $TEMP_DIR
 fi
