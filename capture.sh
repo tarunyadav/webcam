@@ -17,6 +17,8 @@ FLIP=
 BACKUP_MESSAGE=
 VERBOSE=0
 
+set -x
+
 ######################################################################
 # command line inputs
 ######################################################################
@@ -128,8 +130,6 @@ then
     ln -s $INDEX_MASTER_ABSOLUTE_DIR $INDEX_ABSOLUTE_DIR
 fi
 
-if [ ! -e $
-
 ######################################################################
 # stay in the loop for the current minute
 ######################################################################
@@ -160,9 +160,12 @@ do
         # The premise of capture is that you can start once, then capture many times 
         # without closing and re-opening the lens, but that didn't seem to work, so
         # we go through the full cycle each time
-        capture_result_1=`${CAPTURE_PATH} 'start'`
-        capture_result_2=`${CAPTURE_PATH} "capture ${TEMP_FILE_NAME}"`
-        capture_result_3=`${CAPTURE_PATH} 'quit'`
+        capture_start=`${CAPTURE_PATH} 'start'`
+	if [ "${capture_start}" = "0" ]
+	    then
+            capture_capture=`${CAPTURE_PATH} "capture ${TEMP_FILE_NAME}"`
+            capture_quit=`${CAPTURE_PATH} 'quit'`
+	fi
         popd
     fi
 
@@ -193,7 +196,7 @@ do
         day=${newest_file:6:2}
         hour=${newest_file:8:2}
 
-        if [ "${year}${month}${day}${hour}" -eq "${YEAR_STRING}${MONTH_STRING}${DAY_STRING}${HOUR_STRING}" ]
+        if [ "${year}${month}${day}${hour}" = "${YEAR_STRING}${MONTH_STRING}${DAY_STRING}${HOUR_STRING}" ]
         then
     	    cp -f $newest_file ${TEMP_FILE_PATH}
     	    rm ${INCOMING_PATH}/*jpg
