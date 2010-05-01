@@ -160,12 +160,9 @@ do
         # The premise of capture is that you can start once, then capture many times 
         # without closing and re-opening the lens, but that didn't seem to work, so
         # we go through the full cycle each time
-        capture_start=`${CAPTURE_PATH} 'start'`
-	if [ "${capture_start}" = "0" ]
-	    then
-            capture_capture=`${CAPTURE_PATH} "capture ${TEMP_FILE_NAME}"`
-            capture_quit=`${CAPTURE_PATH} 'quit'`
-	fi
+        ${CAPTURE_PATH} 'start'
+        ${CAPTURE_PATH} "capture ${TEMP_FILE_NAME}"
+        ${CAPTURE_PATH} 'quit'
         popd
     fi
 
