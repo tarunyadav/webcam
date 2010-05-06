@@ -5,12 +5,20 @@ How to use the WebCam scripts:
 0) Download and save the scripts and other files to a local directory (http://github.com/jaufrec/webcam/tarball/master)
 
 1) Get a source of images, such as a camera.  WebCam can collect images in any of three ways:
-   a) The GPhoto2 program
-   b) The Capture program.  To install on ubuntu:
-      apt-get install libusb-dev pkg-config libgtk2.0-dev libreadline-dev
-      download, compile, and install libptp2 from http://libptp.sourceforge.net
-      download, compile, and install capture from http://capture.sourceforge.net
-   c) from any source that puts new pictures into a directory.  I use the http://www.airlink101.com/products/aic250.php
+   A) The GPhoto2 program
+   B) The Capture program.  To install on ubuntu:
+      i. apt-get install libusb-dev pkg-config libgtk2.0-dev libreadline-dev
+      ii. download, compile, and install libptp2 from http://libptp.sourceforge.net:
+          a. download and untar the tarball   
+          b. ./configure
+          c. make
+          d. make install
+          e. ldconfig
+      iii. download, compile, and install capture from http://capture.sourceforge.net
+          a. download and untar
+          b. make
+          c. make install
+   C) from any source that puts new pictures into a directory.  I use the http://www.airlink101.com/products/aic250.php
 
 2) Set up a webserver with PHP.  On Ubuntu:
 
@@ -24,10 +32,6 @@ How to use the WebCam scripts:
  index.php (provided with webcam)
  index_month.php (provided with webcam)
  index_day.php (provided with webcam)
- pics_18.png (provided with webcam)
- hd_18.png (provided with webcam)
- pics_36.png (provided with webcam)
- hd_36.png (provided with webcam)
  title.txt (provided with webcam - replace this with your title)
  basic.css (provided with webcam)
  webcam/
@@ -53,6 +57,9 @@ How to use the WebCam scripts:
                    HH:MM:SS.html
 
 All files and directories in this structure are automatically created by the scirpts unless otherwise noted.
+index.php should be customized by changing "webcam" to whatever
+directory name you are using.  If more than one camera is used, the
+current.html include line can be duplicated.
 
 4) Install ffmpeg:
 On ubuntu, 

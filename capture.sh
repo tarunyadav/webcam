@@ -9,15 +9,13 @@ TEMP_DIR=`mktemp -d`
 CAPTURE_PATH=
 GPHOTO2_PATH=
 INCOMING_PATH=
-HOMEPAGE_DIMENSION=
-THUMB_DIMENSION=
+HOMEPAGE_DIMENSION=640x480
+THUMB_DIMENSION=320x240
 JPEGPIXI_PATH=
 JPEGPIXI_ARGUMENT=
 FLIP=
 BACKUP_MESSAGE=
 VERBOSE=0
-
-set -x
 
 ######################################################################
 # command line inputs
@@ -99,7 +97,7 @@ then
     mode_count=`expr $mode_count + 1`
 fi
 
-if [ -e "${INCOMING_PATH}" ]
+if [ -n "${INCOMING_PATH}" ]
 then
     mode_count=`expr $mode_count + 1`
 fi
@@ -178,6 +176,7 @@ do
 
     if [ -e "${INCOMING_PATH}" ]
     then
+        echo "foo"
         pushd ${INCOMING_PATH}
         # grab most recent file for this minute
         incoming_array=(`ls -t *jpg`)
