@@ -16,6 +16,7 @@ JPEGPIXI_ARGUMENT=
 FLIP=
 BACKUP_MESSAGE=
 VERBOSE=0
+UVCCAPTURE=
 
 ######################################################################
 # command line inputs
@@ -28,9 +29,10 @@ usage: $0 options
 
 This script captures an image, either from certain models of Canon camera using 
 either Capture or gphoto2, or from an incoming dump directory, and then rebuilds 
-a web directory index.  You must specify exactly one of -c, -g, or -i.
+a web directory index.  You must specify exactly one of -a, -c, -g, or -i.
 
 OPTIONS:
+   -a      uvccapture path.  Defaults to null.
    -b      If capture fails and backup message is not null, message will
            be shown instead of last available picture.
            Defaults to ${BACKUP_MESSAGE}
@@ -59,9 +61,10 @@ OPTIONS:
 EOF
 }
 
-while getopts b:c:d:f:g:hi:j:n:p:r:t:u:vw: o
+while getopts a:b:c:d:f:g:hi:j:n:p:r:t:u:vw: o
 do	
     case "$o" in
+	a)      UVCCAPTURE_PATH="$OPTARG";;
 	b)      BACKUP_MESSAGE="$OPTARG";;
 	c)      CAPTURE_PATH="$OPTARG";;
 	d)      WEB_ABSOLUTE_DIR="$OPTARG";;
@@ -87,12 +90,17 @@ if [ "${VERBOSE}" == "1" ]
 fi
 
 mode_count=0
-if [ -e "${CAPTURE_PATH}" ]
+if [ -n "${UVCCAPTURE_PATH}" ]
 then
     mode_count=`expr $mode_count + 1`
 fi
 
-if [ -e "${GPHOTO2_PATH}" ]
+if [ -n "${CAPTURE_PATH}" ]
+then
+    mode_count=`expr $mode_count + 1`
+fi
+
+if [ -n "${GPHOTO2_PATH}" ]
 then
     mode_count=`expr $mode_count + 1`
 fi
@@ -104,7 +112,7 @@ fi
 
 if [ "${mode_count}" -ne "1" ]
     then
-    echo "Must specify exactly one of capture, gphoto2, or incoming"
+    echo "Must specify exactly one of -a, -c, -g, or -i."
     exit 1
 fi
 
@@ -149,7 +157,16 @@ do
     # Capture via one of the methods
     ######################################################################
 
-    if [ -e "${CAPTURE_PATH}" ]
+    if [ -n "${UVCCAPTURE_PATH}" ]
+    then
+        # the kill deals with any lingering capture from previous runs
+
+        pushd ${TEMP_DIR}
+        `${UVCCAPTURE_PATH} -o${TEMP_FILE_NAME}`
+        popd
+    fi
+
+    if [ -n "${CAPTURE_PATH}" ]
     then
         # the kill deals with any lingering capture from previous runs
         killall -9 capture
@@ -164,7 +181,7 @@ do
         popd
     fi
 
-    if [ -e "${GPHOTO2_PATH}" ]
+    if [ -n "${GPHOTO2_PATH}" ]
     then
 	# trying a special temp_dir because gphoto2 seems ultra-sensative to directory
         # gphoto2 does not seem to like it if the filename is pathed, so run it from the working directory
@@ -174,7 +191,7 @@ do
         popd
     fi
 
-    if [ -e "${INCOMING_PATH}" ]
+    if [ -n "${INCOMING_PATH}" ]
     then
         echo "foo"
         pushd ${INCOMING_PATH}
