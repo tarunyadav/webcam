@@ -61,10 +61,10 @@ index.php should be customized by changing "webcam" to whatever
 directory name you are using.  If more than one camera is used, the
 current.html include line can be duplicated.
 
-4) Install ffmpeg:
+4) Install ffmpeg and other prerequisites:
 On ubuntu, 
 
-  sudo apt-get install ffmpeg libavcodec-unstripped-52 libavutil-unstripped-49 normalize-audio libsox-fmt-mp3 
+  sudo apt-get install ffmpeg libavcodec-unstripped-52 libavutil-unstripped-49 normalize-audio libsox-fmt-mp3 sox
 
 5) install calibri.ttf at /usr/share/fonts/truetype
 
