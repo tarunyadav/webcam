@@ -17,6 +17,7 @@ MONTAGE_HEIGHT=18
 MONTAGE_WHITESPACE=+0+0
 MONTAGE_MINIMUM=45
 FRAME_SIZE='1920x1080'
+PIP_SIZE='640x480'
 OFFSET='+792+477'
 SECOND_PIC_DIR=
 MAKE_MOVIE=0
@@ -27,6 +28,7 @@ REPLACE_SOUNDTRACK=0
 MONTH_THUMB_WIDTH=256
 
 TEMP_DIR=`mktemp -d`
+PIP_RESIZE_PATH=${TEMP_DIR}/pip.jpg
 FADE_PATH=${TEMP_DIR}/music_fade.wav
 MUSIC_DIR=/pub/music
 WEB_ABSOLUTE_DIR='/var/www'
@@ -59,6 +61,7 @@ OPTIONS:
    -n      Number of frames to use in montage.  Defaults to $MONTAGE_FRAME_COUNT
    -o      Offset for cropping.  Set to zero to scale instead of crop.  
            Defaults to $OFFSET
+   -p      Second picture dimension.  Defaults to $PIP_SIZE.
    -s      Second picture dir, for PIP.  Leave blank for none.  Defaults to blank.
    -t      Dimensions of each tapestry picture.  Defaults to $TAPESTRY_DIM
    -v      Verbose output and preserve the temp output
@@ -72,7 +75,7 @@ OPTIONS:
 EOF
 }
 
-while getopts a:b:d:e:f:hi:l:m:n:o:s:t:vw:z:01234 o
+while getopts a:b:d:e:f:hi:l:m:n:o:p:s:t:vw:z:01234 o
 do	
     case "$o" in
 	a)      MONTAGE_HEIGHT="$OPTARG";;
@@ -87,6 +90,7 @@ do
         m)      MUSIC_DIR="$OPTARG";;
 	n)      MONTAGE_FRAME_COUNT="$OPTARG";;
 	o)      OFFSET="$OPTARG";;
+	p)      PIP_SIZE="$OPTARG";;
 	s)      SECOND_PIC_DIR="$OPTARG";;
 	t)      TAPESTRY_DIM="$OPTARG";;
         v)      VERBOSE=1;;
@@ -205,7 +209,8 @@ then
             pip=`ls ${PIP_ABSOLUTE_DIR}/${hour}:${minute}:??.*jpg | sort | tail -n 1`
             if [ -e "$pip" ]
             then
-                composite -gravity southeast $pip ${output_path} ${output_path}
+                convert -scale ${PIP_SIZE} $pip ${PIP_RESIZE_PATH}
+                composite -gravity southeast ${PIP_RESIZE_PATH} ${output_path} ${output_path}
             fi
         fi
 	let "i = $i + 1"
