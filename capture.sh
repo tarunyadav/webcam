@@ -142,7 +142,6 @@ HOMEPAGE_HTML_PATH=${WEB_ABSOLUTE_DIR}/${CAM_RELATIVE_DIR}/current.html
 
 if [ -z ${REMOTE_PATH} ]
 then
-
     # Make a directory where the picture will go
     mkdir -p ${PIC_ABSOLUTE_DIR}
 
@@ -156,8 +155,10 @@ fi
 ######################################################################
 # stay in the loop for the current minute
 ######################################################################
+
 while [ "`date +%H%M`" -le "${HOUR_STRING}${MINUTE_STRING}" ]
 do
+
     BASE=`date +%H:%M:%S`
     FILE_NAME=${BASE}.jpg
     TEMP_FILE_NAME=${BASE}_raw.jpg
@@ -267,13 +268,13 @@ EOF
 
     if [ -n "${REMOTE_PATH}" ]
     then
-	scp ${TEMP_FILE_PATH} ${REMOTE_PATH}
+	scp ${TEMP_FILE_PATH} ${REMOTE_PATH}${FILE_NAME}
 	if [ "$VERBOSE" == "0" ] 
 	then
 	    rm -rf $TEMP_DIR
 	fi
 	break
-    else
+    fi
 
     ######################################################################
     # make thumbnail image and html snippet
