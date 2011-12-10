@@ -46,7 +46,7 @@ OPTIONS:
    -f      Rotate the picture this many degrees clockwise.
    -g      Path to gphoto2. Defaults to null.
    -h      This help
-   -i      Path to directory of incoming photos of filename format YYYYMMDDHHMMSSxx.jpg. 
+   -i      Path to directory of incoming photos of filename format HH:MM:SSxx.jpg. 
            Will erase contents of this directory.  Defaults to null.   
    -j      Path to jpegpixi image processer.  Defaults to null.   
    -n      Camera name.  Defaults to ${CAM_NAME}
@@ -211,7 +211,6 @@ do
 
     if [ -n "${INCOMING_PATH}" ]
     then
-        echo "foo"
         pushd ${INCOMING_PATH}
         # grab most recent file for this minute
         incoming_array=(`ls -t *jpg`)
@@ -222,12 +221,10 @@ do
 	    break
 	fi
 
-        year=${newest_file:0:4}
-        month=${newest_file:4:2}
-        day=${newest_file:6:2}
-        hour=${newest_file:8:2}
+	# make sure the file is roughly correct by checking the hour part of the stamp
+        hour=${newest_file:0:2}
 
-        if [ "${year}${month}${day}${hour}" = "${YEAR_STRING}${MONTH_STRING}${DAY_STRING}${HOUR_STRING}" ]
+        if [ "${hour}" = "${HOUR_STRING}" ]
         then
     	    cp -f $newest_file ${TEMP_FILE_PATH}
     	    rm ${INCOMING_PATH}/*jpg
