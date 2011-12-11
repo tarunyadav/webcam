@@ -64,7 +64,7 @@ current.html include line can be duplicated.
 4) Install ffmpeg and other prerequisites:
 On ubuntu, 
 
-  sudo apt-get install ffmpeg libavcodec-unstripped-52 libavutil-unstripped-49 normalize-audio libsox-fmt-mp3 sox
+  sudo apt-get install ffmpeg libavcodec-unstripped-52 libavutil-unstripped-49 normalize-audio libsox-fmt-all lame sox
 
 5) install calibri.ttf at /usr/share/fonts/truetype
 
