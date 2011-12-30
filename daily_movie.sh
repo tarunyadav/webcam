@@ -30,7 +30,7 @@ MONTH_THUMB_WIDTH=256
 TEMP_DIR=`mktemp -d`
 PIP_RESIZE_PATH=${TEMP_DIR}/pip.jpg
 FADE_PATH=${TEMP_DIR}/music_fade.wav
-MUSIC_DIR=/pub/music
+MUSIC_DIR=/pub/Music
 WEB_ABSOLUTE_DIR='/var/www'
 BASE_RELATIVE_DIR='webcam'
 
@@ -66,6 +66,7 @@ OPTIONS:
    -t      Dimensions of each tapestry picture.  Defaults to $TAPESTRY_DIM
    -v      Verbose output and preserve the temp output
    -w      Set border between pictures in montage.  Defaults to $MONTAGE_WHITESPACE
+   -x      Set web directory.  Defaults to $WEB_ABSOLUTE_DIR
    -z      Frame size.  Defaults to $FRAME_SIZE
    -1      Make the movie
    -2      Make the montage
@@ -75,7 +76,7 @@ OPTIONS:
 EOF
 }
 
-while getopts a:b:d:e:f:hi:l:m:n:o:p:s:t:vw:z:01234 o
+while getopts a:b:d:e:f:hi:l:m:n:o:p:s:t:vw:x:z:01234 o
 do	
     case "$o" in
 	a)      MONTAGE_HEIGHT="$OPTARG";;
@@ -95,6 +96,7 @@ do
 	t)      TAPESTRY_DIM="$OPTARG";;
         v)      VERBOSE=1;;
         w)      MONTAGE_WHITESPACE="$OPTARG";;
+        x)      WEB_ABSOLUTE_DIR="$OPTARG";;
         z)      FRAME_SIZE="$OPTARG";;
         1)      MAKE_MOVIE=1;;
         2)      MAKE_MONTAGE=1;;

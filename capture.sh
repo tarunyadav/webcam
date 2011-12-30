@@ -11,12 +11,15 @@ GPHOTO2_PATH=
 INCOMING_PATH=
 HOMEPAGE_DIMENSION=640x480
 THUMB_DIMENSION=320x240
+WIDTH=1600
+HEIGHT=1200
 JPEGPIXI_PATH=
 JPEGPIXI_ARGUMENT=
 FLIP=
 BACKUP_MESSAGE=
 VERBOSE=0
 UVCCAPTURE=
+REMOTE_PATH=
 
 ######################################################################
 # command line inputs
@@ -43,12 +46,13 @@ OPTIONS:
    -f      Rotate the picture this many degrees clockwise.
    -g      Path to gphoto2. Defaults to null.
    -h      This help
-   -i      Path to directory of incoming photos of filename format YYYYMMDDHHMMSSxx.jpg. 
+   -i      Path to directory of incoming photos of filename format HH:MM:SSxx.jpg. 
            Will erase contents of this directory.  Defaults to null.   
    -j      Path to jpegpixi image processer.  Defaults to null.   
    -n      Camera name.  Defaults to ${CAM_NAME}
    -p      Argument for jpexpixi processor.  Defaults to null.   
    -r      Relative path for webcam directory.  Defaults to ${CAM_RELATIVE_DIR}
+   -s      Address to send picture to remote server by SCP.  Defaults to null.  If present, script will not update homepage or make thumbnail
    -t      Thumbnail dimension.  Defaults to ${THUMB_DIMENSION}.  
            If not null, creates thumbnail and index within daily directory
    -u      Current thumbnail dimension.  Defaults to ${HOMEPAGE_DIMENSION}.  
@@ -58,10 +62,12 @@ OPTIONS:
    -w      Number of seconds to wait after taking a picture.  Defaults to null.  
            If set, will try to take photos, spaced by this interval, for one minute.
            Otherwise, will take one photo and exit.
+   -x      Image width for UVC Capture.  Defaults to ${WIDTH}
+   -y      Image height for UVC Capture.  Defaults to ${HEIGHT}
 EOF
 }
 
-while getopts a:b:c:d:f:g:hi:j:n:p:r:t:u:vw: o
+while getopts a:b:c:d:f:g:hi:j:n:p:r:s:t:u:vw:x:y: o
 do	
     case "$o" in
 	a)      UVCCAPTURE_PATH="$OPTARG";;
@@ -77,10 +83,13 @@ do
 	n)      CAM_NAME="$OPTARG";;
 	p)      JPEGPIXI_ARGUMENT="$OPTARG";;
 	r)      CAM_RELATIVE_DIR="$OPTARG";;
+	s)      REMOTE_PATH="$OPTARG";;
 	t)      THUMB_DIMENSION="$OPTARG";;
         u)      HOMEPAGE_DIMENSION="$OPTARG";;
         v)      VERBOSE=1;;
 	w)      WAIT="$OPTARG";;
+        x)      WIDTH="$OPTARG";;
+        y)      HEIGHT="$OPTARG";;
     esac
 done
 
@@ -130,17 +139,26 @@ INDEX_ABSOLUTE_DIR=${PIC_ABSOLUTE_DIR}/index.php
 HOMEPAGE_RELATIVE_PATH=/${CAM_RELATIVE_DIR}/current.jpg
 HOMEPAGE_ABSOLUTE_PATH=${WEB_ABSOLUTE_DIR}${HOMEPAGE_RELATIVE_PATH}
 HOMEPAGE_HTML_PATH=${WEB_ABSOLUTE_DIR}/${CAM_RELATIVE_DIR}/current.html
-mkdir -p ${PIC_ABSOLUTE_DIR}
-if [ ! -e ${INDEX_ABSOLUTE_DIR} ]
+
+if [ -z ${REMOTE_PATH} ]
 then
-    ln -s $INDEX_MASTER_ABSOLUTE_DIR $INDEX_ABSOLUTE_DIR
+    # Make a directory where the picture will go
+    mkdir -p ${PIC_ABSOLUTE_DIR}
+
+    # Set up the index for the new directory if necessary
+    if [ ! -e ${INDEX_ABSOLUTE_DIR} ]
+    then
+	ln -s $INDEX_MASTER_ABSOLUTE_DIR $INDEX_ABSOLUTE_DIR
+    fi
 fi
 
 ######################################################################
 # stay in the loop for the current minute
 ######################################################################
+
 while [ "`date +%H%M`" -le "${HOUR_STRING}${MINUTE_STRING}" ]
 do
+
     BASE=`date +%H:%M:%S`
     FILE_NAME=${BASE}.jpg
     TEMP_FILE_NAME=${BASE}_raw.jpg
@@ -162,7 +180,7 @@ do
         # the kill deals with any lingering capture from previous runs
 
         pushd ${TEMP_DIR}
-        `${UVCCAPTURE_PATH} -o${TEMP_FILE_NAME}`
+        `${UVCCAPTURE_PATH} -x${WIDTH} -y${HEIGHT} -o${TEMP_FILE_NAME}`
         popd
     fi
 
@@ -193,7 +211,6 @@ do
 
     if [ -n "${INCOMING_PATH}" ]
     then
-        echo "foo"
         pushd ${INCOMING_PATH}
         # grab most recent file for this minute
         incoming_array=(`ls -t *jpg`)
@@ -204,12 +221,10 @@ do
 	    break
 	fi
 
-        year=${newest_file:0:4}
-        month=${newest_file:4:2}
-        day=${newest_file:6:2}
-        hour=${newest_file:8:2}
+	# make sure the file is roughly correct by checking the hour part of the stamp
+        hour=${newest_file:0:2}
 
-        if [ "${year}${month}${day}${hour}" = "${YEAR_STRING}${MONTH_STRING}${DAY_STRING}${HOUR_STRING}" ]
+        if [ "${hour}" = "${HOUR_STRING}" ]
         then
     	    cp -f $newest_file ${TEMP_FILE_PATH}
     	    rm ${INCOMING_PATH}/*jpg
@@ -243,12 +258,28 @@ EOF
 	jpegpixi $TEMP_FILE_PATH $TEMP_FILE_PATH ${JPEGPIXI_ARGUMENT}
     fi
 
-    cp $TEMP_FILE_PATH $PIC_ABSOLUTE_PATH
+
+    ######################################################################
+    # Possibly copy the file to a remote server and quit
+    ######################################################################
+
+    if [ -n "${REMOTE_PATH}" ]
+    then
+	scp ${TEMP_FILE_PATH} ${REMOTE_PATH}${FILE_NAME}
+	if [ "$VERBOSE" == "0" ] 
+	then
+	    rm -rf $TEMP_DIR
+	fi
+	break
+    fi
 
     ######################################################################
     # make thumbnail image and html snippet
     ######################################################################
 
+    cp $TEMP_FILE_PATH $PIC_ABSOLUTE_PATH
+
+    # if something went wrong and the picture is not where it should be, abort
     if [ ! -e "${PIC_ABSOLUTE_PATH}" ]
     then
 	break
