@@ -33,6 +33,7 @@ FADE_PATH=${TEMP_DIR}/music_fade.wav
 MUSIC_DIR=/pub/Music
 WEB_ABSOLUTE_DIR='/var/www'
 BASE_RELATIVE_DIR='webcam'
+FFMPEG_PATH=`which ffmpeg`
 
 ######################################################################
 # command line inputs
@@ -198,9 +199,20 @@ then
 	output_path=${TEMP_DIR}/`printf %06d $i`.jpg
         if [ -z "$OFFSET" ]
             then
-	    convert -scale ${FRAME_SIZE} $file ${output_path}
+	    # error-handle.  If the incoming picture is bad, don't pass on a bad picture
+	    CMD='convert -scale ${FRAME_SIZE} $file ${output_path}'
+	    if [ $? != 0 ]
+		then
+		rm ${output_path}
+		continue
+	    fi
         else
-	    convert -crop ${FRAME_SIZE}${OFFSET} $file ${output_path}
+	    CMD=`convert -crop ${FRAME_SIZE}${OFFSET} $file ${output_path}`
+	    if [ $? != 0 ]
+		then
+		rm ${output_path}
+		continue
+	    fi
         fi
         if [ -e "${PIP_ABSOLUTE_DIR}" ]
         then
@@ -240,8 +252,8 @@ then
     ######################################################################
     # make the movie
     ######################################################################
-
-    /usr/local/bin/ffmpeg -y -r ${FRAMERATE} -s ${FRAME_SIZE} -qscale 3 -i ${TEMP_DIR}/%06d.jpg -i $FADE_PATH -t $DURATION $MOVIE_ABSOLUTE_PATH
+3H
+    $FFMEG_PATH -y -r ${FRAMERATE} -s ${FRAME_SIZE} -qscale 3 -i ${TEMP_DIR}/%06d.jpg -i $FADE_PATH -t $DURATION $MOVIE_ABSOLUTE_PATH
     # -r output framerate
     # -i input files (pictures and sound)
     # -s size
@@ -250,7 +262,7 @@ then
     # -y overwrite output
 
     # make the low-def version
-    /usr/local/bin/ffmpeg -y -i $MOVIE_ABSOLUTE_PATH -fs 5000000 -s 320x180 $MOVIE_LOW_ABSOLUTE_PATH
+    $FFMEG_PATH -y -i $MOVIE_ABSOLUTE_PATH -fs 5000000 -s 320x180 $MOVIE_LOW_ABSOLUTE_PATH
     # -fs maximum output file size
 fi
 
@@ -267,7 +279,7 @@ then
     then
 	MONTAGE_NO_DATA=1
     else
-	ffmpeg_duration=`/usr/local/bin/ffmpeg -i $MOVIE_ABSOLUTE_PATH 2>&1 | grep Duration`
+	ffmpeg_duration=`$FFMEG_PATH -i $MOVIE_ABSOLUTE_PATH 2>&1 | grep Duration`
 	minutes=`echo $ffmpeg_duration | grep -o ':[0-9]\{2\}:' | grep -o '[0-9]\{2\}'`
 	seconds=`echo $ffmpeg_duration | grep -o ':[0-9]\{2\}\.' | grep -o '[0-9]\{2\}'`
 	DURATION=`expr $minutes \* 60 + $seconds`
@@ -290,7 +302,7 @@ then
 	    do
 		output=${TEMP_DIR}/thumb`printf %04d $i`.png
 		offset=`expr \( $i \* ${MONTAGE_INTERVAL} \) \+ \( ${MONTAGE_INTERVAL} / 2 \) `
-		/usr/local/bin/ffmpeg -y -i $MOVIE_ABSOLUTE_PATH -f mjpeg -ss ${offset} -vframes 1 -s ${TAPESTRY_DIM} -an $output
+		$FFMEG_PATH -y -i $MOVIE_ABSOLUTE_PATH -f mjpeg -ss ${offset} -vframes 1 -s ${TAPESTRY_DIM} -an $output
 		let "i = $i + 1"
 	    done
 	    
@@ -391,7 +403,7 @@ fi
 if [ "$REPLACE_SOUNDTRACK" -eq 1 ]
 then
     # TODO: duplicates previous code; ought to be in a function
-    ffmpeg_duration=`/usr/local/bin/ffmpeg -i $MOVIE_ABSOLUTE_PATH 2>&1 | grep Duration`
+    ffmpeg_duration=`$FFMEG_PATH -i $MOVIE_ABSOLUTE_PATH 2>&1 | grep Duration`
     minutes=`echo $ffmpeg_duration | grep -o ':[0-9]\{2\}:' | grep -o '[0-9]\{2\}'`
     seconds=`echo $ffmpeg_duration | grep -o ':[0-9]\{2\}\.' | grep -o '[0-9]\{2\}'`
     DURATION=`expr $minutes \* 60 + $seconds`
@@ -400,9 +412,9 @@ then
     MUSIC_PATH=`find $MUSIC_DIR -name \*mp3 | sort -R | tail -n 1`
     sox "$MUSIC_PATH" $FADE_PATH fade t 0 $DURATION 8
     normalize-audio $FADE_PATH
-    /usr/local/bin/ffmpeg -y -i $MOVIE_ABSOLUTE_PATH -i $FADE_PATH -map 0:0 -map 1:0 -vcodec copy -acodec libfaac $TEMP_DIR/hd.mp4
+    $FFMEG_PATH -y -i $MOVIE_ABSOLUTE_PATH -i $FADE_PATH -map 0:0 -map 1:0 -vcodec copy -acodec libfaac $TEMP_DIR/hd.mp4
     mv $TEMP_DIR/hd.mp4 $MOVIE_ABSOLUTE_PATH
-    /usr/local/bin/ffmpeg -y -i $MOVIE_LOW_ABSOLUTE_PATH -i $FADE_PATH -map 0:0 -map 1:0 -vcodec copy -acodec libfaac $TEMP_DIR/low.mp4
+    $FFMEG_PATH -y -i $MOVIE_LOW_ABSOLUTE_PATH -i $FADE_PATH -map 0:0 -map 1:0 -vcodec copy -acodec libfaac $TEMP_DIR/low.mp4
     mv $TEMP_DIR/low.mp4 $MOVIE_LOW_ABSOLUTE_PATH
 fi
 
